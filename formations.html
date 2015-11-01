@@ -1,0 +1,70 @@
+<html>
+<head>
+
+<script src="jquery-2.1.4.js"></script>
+<script src="formations.js"></script>
+<script>
+
+var baseGrid = new Grid("base",10,10);
+var entity1 = new Ont("source","A",baseGrid);
+
+var ptStr = {"curr":3, "max": 3, "min":0};
+var inflection1 = new Inflection(baseGrid, entity1, 1, "food", 4, 5, ptStr);
+
+$("body").ready(function() {
+	
+
+	baseGrid.draw();
+
+	inflection1.initialize();
+
+	inflection1.draw();
+
+	$("#go").on("click", function() {
+
+		baseGrid.clear();
+		
+		entity1.move();
+
+	});
+
+
+});
+
+
+</script>
+
+<style>
+
+table {
+	border-collapse: collapse;
+}
+
+td {
+
+	height:20px;
+	width:20px;
+	border:solid thin black;
+	text-align: center;
+}
+span {
+	font-size:12pt;
+	color: green;
+	
+}
+
+</style>
+
+
+</head>
+<body>
+
+<input type="button" value="Go" id="go"></input>
+
+</body>
+</html>
+
+
+
+
+

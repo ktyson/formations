@@ -1,0 +1,247 @@
+<html>
+<head>
+
+<script src="jquery-2.1.4.js"></script>
+<script>
+
+var entity1 = {};
+var entity2 = {};
+var entity3 = {};
+
+entity1.letter = "A";
+entity2.letter = "B";
+entity3.letter = "C";
+
+var MAX_X = 12;
+var MAX_Y = 12;
+
+$("body").ready(function() {
+	
+
+	makeGrid();
+
+	var fieldObj1 = {};
+	fieldObj1.ctr_x = 5;
+	fieldObj1.ctr_y = 7;
+	fieldObj1.pt_strength = 3;
+	fieldObj1.field = [];
+	initializeField(fieldObj1);
+	makeField(fieldObj1);
+
+
+
+
+	initEntity(entity1);
+	initEntity(entity2);
+	initEntity(entity3);
+
+	$("#go").on("click", function() {
+
+		clearGrid();
+		
+		moveEntity(entity1);
+		moveEntity(entity2);
+		moveEntity(entity3);
+
+	});
+
+
+});
+
+function initEntity(entity) {
+
+	entity.x = Math.ceil(Math.random()*MAX_X);
+	entity.y = Math.ceil(Math.random()*MAX_Y);
+
+	moveEntity(entity);
+
+	
+}
+
+function moveEntity(entity) {
+
+//console.log("initial", entity.x, entity.y );
+
+	var changeX = Math.ceil(Math.random()*3);
+	if(changeX == 2) entity.x = entity.x + 1;
+	if(changeX == 3) entity.x = entity.x - 1;
+
+	var changeY = Math.ceil(Math.random()*3);
+	if(changeY == 2) entity.y = entity.y + 1;
+	if(changeY == 3) entity.y = entity.y - 1;
+
+
+//console.log("randomizer", "x", changeX, "y", changeY, "result", entity.x, entity.y );
+
+	if(entity.x > MAX_X) {
+		entity.x = MAX_X;
+	}
+	if(entity.x < 1) {
+		entity.x = 1;
+	}
+
+	if(entity.y > MAX_Y) {
+		entity.y = MAX_Y;
+	}
+	if(entity.y < 1) {
+		entity.y = 1;
+	}
+	
+//console.log("walk-across", "result", entity.x, entity.y );
+
+
+	var cellAddress = entity.x + "_" + entity.y;
+	$("#" + cellAddress).text(entity.letter);
+
+
+}
+
+
+function makeGrid() {
+
+	var c = [];
+
+	c.push("<table>");
+	for(var x = 1; x <= MAX_X; x++) {
+		c.push("<tr>");
+		for(var y = 1; y <= MAX_Y; y++) {
+			c.push("<td><span id='" + x + "_" + y + "'></span>" );
+		}
+		c.push("</tr>");
+	}
+	c.push("</table>");
+
+	$("body").append(c.join(''));
+
+}
+
+
+function clearGrid() {
+
+	$("span").text("");
+
+}
+
+
+
+
+function initializeField(fieldObj) {
+
+	var field = fieldObj.field;
+	for(var x = 1; x <= MAX_X; x++) {
+		for (var y = 1; y <= MAX_Y; y++) {
+
+			var val = getVal(fieldObj.ctr_x, fieldObj.ctr_y, fieldObj.pt_strength, x, y);
+//str = field strength
+			var str = {"x":x, "y":y, "str" : val};
+			field.push(str);
+
+		}
+
+	}
+
+}
+
+function makeField(fieldObj) {
+
+	$.each(fieldObj.field, function(idx, val){
+
+//console.log(val.x, val.y, val.str, getHeat(val.str, 10));
+
+		var thisHeat = getHeat(val.str, fieldObj.pt_strength);
+
+		//$("#" + val.x + "_" + val.y).text(val.str);
+
+		var colorNum = getHeatColor(thisHeat);
+		//console.log(colorNum);
+		
+		$("#" + val.x + "_" + val.y).parent().css('background', colorNum);
+
+
+	});
+
+
+}
+
+function getVal(x_ctr,y_ctr, str, x, y) {
+//str = point strength
+//prox = proximity strength
+//console.log(x_ctr,y_ctr, str, x, y)
+
+	var prox = Math.abs(x_ctr - x) + Math.abs(y_ctr - y);
+	
+//console.log(prox, str)
+
+	var str1 = str - prox;
+
+	if(str1 < 0) str1 = 0;
+//console.log(str1);
+	return str1;
+}
+
+function getHeat(str, max) {
+
+	//translate field strength into heat %
+
+	return Math.floor(255*str/max);
+
+
+}
+
+function getHeatColor(myHeat) {
+
+	var rgbString = "rgb(" + myHeat + "," + myHeat + "," + myHeat + ")";
+	//var rgbString = "rgb(0, 70, 255)"; // get this in whatever way.
+
+//console.log(rgbString);
+
+	var parts = rgbString.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+	// parts now should be ["rgb(0, 70, 255", "0", "70", "255"]
+
+	delete (parts[0]);
+	for (var i = 1; i <= 3; ++i) {
+	    parts[i] = parseInt(parts[i]).toString(16);
+	    if (parts[i].length == 1) parts[i] = '0' + parts[i];
+	} 
+	var hexString ='#'+parts.join('').toUpperCase(); // "#0070FF"
+
+	return hexString;
+
+}
+
+</script>
+
+<style>
+
+table {
+	border-collapse: collapse;
+}
+
+td {
+
+	height:20px;
+	width:20px;
+	border:solid thin black;
+	text-align: center;
+}
+span {
+	font-size:12pt;
+	color: green;
+	
+}
+
+</style>
+
+
+</head>
+<body>
+
+<input type="button" value="Go" id="go"></input>
+
+</body>
+</html>
+
+
+
+
+
